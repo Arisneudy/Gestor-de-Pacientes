@@ -1,0 +1,108 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<GestorDePaciente.Core.Application.ViewModels.Office.Doctor.DoctorViewModel>
+@{
+    ViewData["Title"] = "Doctores";
+}
+<style>
+    .btn-outline-primary {
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mt-3">Mantenimiento de Doctores</h1>
+            <div class="mt-5 mb-4 d-flex justify-content-end">
+                <a class="btn btn-outline-primary" asp-controller="Doctor" asp-action="Create">Agregar un nuevo doctor</a>
+            </div>
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        <table class="table table-sm table-hover table-borderless text-center">
+                            <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Correo</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var doctor in Model)
+                            {
+                                @if (doctor != null)
+                                {
+                                    <tr class="text-center align-middle">
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(doctor.UrlProfilePicture))
+                                            {
+                                                <img src="@doctor.UrlProfilePicture" alt="Foto de perfil" class="rounded-circle" style="width: 50px; height: 50px;">
+                                            }
+                                            else
+                                            {
+                                                <div>No Hay</div>
+                                            }
+                                        </td>
+                                        <td>@doctor.Name</td>
+                                        <td>@doctor.LastName</td>
+                                        <td>@doctor.Email</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-warning text-black" asp-controller="Doctor" asp-action="Edit" asp-route-idDoctor="@doctor.Id">Editar</a>
+                                            <a class="btn btn-sm btn-outline-danger" asp-controller="Doctor" asp-action="Delete" asp-route-idDoctor="@doctor.Id" onclick="eliminar(event, @doctor.Id)">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        No hay doctores registrados
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function eliminar(event, idDoctor) {
+            event.preventDefault();
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: '@TempData["Error"]',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                </text>
+            }
+            else
+            {
+                <text>
+                    Swal.fire({
+                        title: '¿Está seguro de que desea eliminar este doctor?',
+                        showDenyButton: true,
+                        confirmButtonText: `Si`,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/Doctor/Delete?idDoctor=${idDoctor}`;
+                        }
+                    });
+                </text>
+            }
+        }
+    </script>
+}

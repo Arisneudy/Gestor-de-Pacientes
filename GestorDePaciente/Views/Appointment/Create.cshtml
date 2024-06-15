@@ -1,0 +1,147 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Office
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@using GestorDePaciente.Core.Application.ViewModels.Office.Doctor
+@using GestorDePaciente.Core.Application.ViewModels.Office.Patient
+@using GestorDePaciente.Core.Application.ViewModels.Role
+@using GestorDePaciente.Core.Application.ViewModels.Users
+@model GestorDePaciente.Core.Application.ViewModels.Office.Appointment.SaveAppointmentViewModel
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    bool isEditing = Model.Id == 0 ? false : true;
+    UserViewModel user = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+@{
+    ViewData["Title"] = $"{(isEditing ? "Actualizar" : "Crear")}";
+}
+<style>
+    .container-fluid {
+        display: flex;
+        justify-content: center;
+    }
+
+    .card {
+        border-radius: 10px;
+        height: auto;
+        width: 30rem;
+    }
+</style>
+<div class="container-fluid">
+    <div class="mt-5">
+        <div class="card shadow-lg">
+            <div class="mt-5 text-center text-black">
+                <h1 class="h3 fw-bold mb-3">@(isEditing ? "Actualizar" : "Crear") Cita</h1>
+            </div>
+            <div class="card-body text-black">
+                <form method="post" asp-action="@(isEditing ? "Edit" : "Create")" asp-controller="Appointment">
+                    <div class="row mb-3">
+                        <input asp-for="Id" hidden readonly/>
+                        <div class="col">
+                            <label asp-for="IdPatient" class="form-label">Paciente</label>
+                            <select asp-for="IdPatient" class="form-select">
+                                @foreach (var patient in ViewBag.Patients as List<PatientViewModel> ?? new List<PatientViewModel>())
+                                {
+                                    if (patient.DoctorOfficeId == user.DoctorOfficeId)
+                                    {
+                                        <option value="@patient.Id" selected>@patient.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@patient.Id">@patient.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdPatient" class="text-danger"></span>
+                        </div>
+                        <div class="col">
+                            <label asp-for="IdDoctor" class="form-label">Doctor</label>
+                            <select asp-for="IdDoctor" class="form-select">
+                                @foreach (var doctor in ViewBag.Doctors as List<DoctorViewModel> ?? new List<DoctorViewModel>())
+                                {
+                                    if (doctor.DoctorOfficeId == user.DoctorOfficeId)
+                                    {
+                                        <option value="@doctor.Id" selected>@doctor.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@doctor.Id">@doctor.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="IdDoctor" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="Date" class="form-label">Fecha</label>
+                            <input asp-for="Date" class="form-control" />
+                            <span asp-validation-for="Date" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="Description" class="form-label">Descripcion</label>
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="Status" class="form-label">Estado</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="1">PENDIENTE_CONSULTA</option>
+                                <option value="2">PENDIENTE_RESULTADO</option>
+                                <option value="3">COMPLETADA</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="DoctorOfficeId" class="form-label">Consultorio</label>
+                            <select asp-for="DoctorOfficeId" class="form-select" style="pointer-events: none; background-color: #DEDEDE">
+                                @foreach (var doctorOffice in ViewBag.DoctorOffices as List<DoctorOfficeViewModel> ?? new List<DoctorOfficeViewModel>())
+                                {
+                                    if (doctorOffice.Id == user.DoctorOfficeId)
+                                    {
+                                        <option value="@doctorOffice.Id" selected>@doctorOffice.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@doctorOffice.Id">@doctorOffice.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="DoctorOfficeId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">@(isEditing ? "Actualizar" : "Crear")</button>
+                        <a asp-action="Appointment" asp-controller="Appointment" class="btn btn-link text-decoration-none">Ir atras</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function togglePasswordVisibility(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const togglePasswordIcon = document.getElementById(iconId);
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordIcon.classList.remove('bi-eye');
+            togglePasswordIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            togglePasswordIcon.classList.remove('bi-eye-slash');
+            togglePasswordIcon.classList.add('bi-eye');
+        }
+    }
+
+</script>
+}

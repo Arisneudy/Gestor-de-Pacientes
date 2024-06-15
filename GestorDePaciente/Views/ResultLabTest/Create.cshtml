@@ -1,0 +1,76 @@
+﻿@* @using GestorDePaciente.Core.Application.ViewModels.Office *@
+@* @using Microsoft.AspNetCore.Mvc.TagHelpers *@
+@* @using Microsoft.AspNetCore.Http; *@
+@* @using GestorDePaciente.Core.Application.Helpers; *@
+@* @using GestorDePaciente.Core.Application.ViewModels.Users *@
+@* @model GestorDePaciente.Core.Application.ViewModels.Lab.Result.SaveResultTestViewModel; *@
+@* @inject IHttpContextAccessor HttpContextAccessor *@
+@* @{ *@
+@*     bool isEditing = Model.Id == 0 ? false : true; *@
+@*     UserViewModel user = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!; *@
+@* } *@
+@* @{ *@
+@*     ViewData["Title"] = $"{(isEditing ? "Actualizar" : "Crear")}"; *@
+@* } *@
+@* <style> *@
+@*     .container-fluid { *@
+@*         display: flex; *@
+@*         justify-content: center; *@
+@*     } *@
+@* *@
+@*     .card { *@
+@*         border-radius: 10px; *@
+@*         height: auto; *@
+@*         width: 30rem; *@
+@*     } *@
+@* </style> *@
+@* <div class="container-fluid"> *@
+@*     <div class="mt-5"> *@
+@*         <div class="card shadow-lg"> *@
+@*             <div class="mt-5 text-center text-black"> *@
+@*                 <h1 class="h3 fw-bold mb-3">@(isEditing ? "Actualizar" : "Crear") Paciente</h1> *@
+@*             </div> *@
+@*             <div class="card-body text-black"> *@
+@*                 <form method="post" enctype="multipart/form-data" asp-action="@(isEditing ? "Edit" : "Create")" asp-controller="ResultLabTest"> *@
+@*                     <div class="row mb-3"> *@
+@*                         <input asp-for="Id" hidden readonly/> *@
+@*                         <div class="col"> *@
+@*                             <label asp-for="Result" class="form-label">Resultado</label> *@
+@*                             <textarea asp-for="Result" class="form-control"></textarea> *@
+@*                             <span asp-validation-for="Result" class="text-danger"></span> *@
+@*                         </div> *@
+@*                         <div class="col"> *@
+@*                             <label asp-for="Status" class="form-label">Apellido</label> *@
+@*                             <input asp-for="Status" class="form-control"/> *@
+@*                             <span asp-validation-for="LastName" class="text-danger"></span> *@
+@*                         </div> *@
+@*                     </div> *@
+@*                     <div class="text-center mt-4"> *@
+@*                         <button type="submit" class="btn btn-primary">@(isEditing ? "Actualizar" : "Crear")</button> *@
+@*                         <a asp-action="Create" asp-controller="ResultLabTest" class="btn btn-link text-decoration-none">Ir atras</a> *@
+@*                     </div> *@
+@*                 </form> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+@* *@
+@* @section Scripts { *@
+@*     <script> *@
+@*         function togglePasswordVisibility(inputId, iconId) { *@
+@*             const passwordInput = document.getElementById(inputId); *@
+@*             const togglePasswordIcon = document.getElementById(iconId); *@
+@* *@
+@*             if (passwordInput.type === 'password') { *@
+@*                 passwordInput.type = 'text'; *@
+@*                 togglePasswordIcon.classList.remove('bi-eye'); *@
+@*                 togglePasswordIcon.classList.add('bi-eye-slash'); *@
+@*             } else { *@
+@*                 passwordInput.type = 'password'; *@
+@*                 togglePasswordIcon.classList.remove('bi-eye-slash'); *@
+@*                 togglePasswordIcon.classList.add('bi-eye'); *@
+@*             } *@
+@*         } *@
+@*      *@
+@*     </script> *@
+@* } *@

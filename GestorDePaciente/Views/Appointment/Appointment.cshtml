@@ -1,0 +1,126 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Users
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@using GestorDePaciente.Core.Application.ViewModels.Office.Doctor
+@using GestorDePaciente.Core.Application.ViewModels.Office.Patient
+@model List<GestorDePaciente.Core.Application.ViewModels.Office.Appointment.AppointmentViewModel>
+@{
+    ViewData["Title"] = "Citas";
+}
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserViewModel userAc = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+<style>
+    .btn-outline-primary {
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mt-3">Mantenimiento de Citas</h1>
+            <div class="mt-5 mb-4 d-flex justify-content-end">
+                <a class="btn btn-outline-primary" asp-controller="Appointment" asp-action="Create">Agregar una nueva cita</a>
+            </div>
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        <table class="table table-sm table-hover table-borderless text-center">
+                            <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Doctor</th>
+                                <th>Fecha</th>
+                                <th>Causa</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var appointment in Model)
+                            {
+                                @if (appointment != null)
+                                {
+                                    <tr>
+                                        <td>
+                                            @foreach (var paciente in ViewBag.Patients as List<PatientViewModel> ?? new List<PatientViewModel>())
+                                            {
+                                                if (paciente.Id == appointment.IdPatient && userAc.DoctorOfficeId == paciente.DoctorOfficeId)
+                                                {
+                                                    @paciente.Name
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @foreach (var doctor in ViewBag.Doctors as List<DoctorViewModel> ?? new List<DoctorViewModel>())
+                                            {
+                                                if (doctor.Id == appointment.IdDoctor && userAc.DoctorOfficeId == doctor.DoctorOfficeId)
+                                                {
+                                                    @doctor.Name
+                                                }
+                                            }
+                                        </td>
+                                        <td>@appointment.Date</td>
+                                        <td>@appointment.Description</td>
+                                        <td>@appointment.Status.ToString()</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-warning text-black" asp-controller="Appointment" asp-action="Edit" asp-route-idCita="@appointment.Id">Editar</a>
+                                            <a class="btn btn-sm btn-outline-danger" asp-controller="Appointment" asp-action="Delete" asp-route-idCita="@appointment.Id" onclick="eliminar(event, @appointment.Id)">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        No hay citas registradas
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function eliminar(event, idCita) {
+            event.preventDefault();
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: '@TempData["Error"]',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                </text>
+            }
+            else
+            {
+                <text>
+                    Swal.fire({
+                        title: '¿Está seguro de que desea eliminar esta cita?',
+                        showDenyButton: true,
+                        confirmButtonText: `Si`,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/Appointment/Delete?idCita=${idCita}`;
+                        }
+                    });
+                </text>
+            }
+        }
+    </script>
+}

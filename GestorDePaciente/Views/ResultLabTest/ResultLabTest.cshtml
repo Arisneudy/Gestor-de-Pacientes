@@ -1,0 +1,129 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Users
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@using GestorDePaciente.Core.Application.ViewModels.Lab.Test
+@using GestorDePaciente.Core.Application.ViewModels.Office.Patient
+@model List<GestorDePaciente.Core.Application.ViewModels.Office.Patient.PatientViewModel>
+@{
+    ViewData["Title"] = "Resultados de Pruebas";
+}
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserViewModel userAc = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+<style>
+    .btn-outline-primary {
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mt-3">Mantenimiento de Resultados de Pruebas de Laboratorios</h1>
+            <form class="d-flex justify-content-center align-content-center mt-5" asp-controller="ResultLabTest" asp-action="ResultLabTest" method="post">
+                <div class="form-group mx-2 w-100">
+                    <input class="form-control" type="text" name="cedula" placeholder="Cedula del paciente" />
+                </div>
+                <button class="btn btn-primary mx-2" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+            <div class="mt-5 mb-4 d-flex justify-content-end">
+                <a class="btn btn-outline-primary" asp-controller="ResultLabTest" asp-action="Create">Agregar un nuevo resultado</a>
+            </div>
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        <table class="table table-sm table-hover table-borderless text-center">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Cedula</th>
+                                    <th>Prueba</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var lbt in Model)
+                            {
+                                @if (lbt != null)
+                                {
+                                    <tr>
+                                        @foreach (var paciente in ViewBag.Patients as List<PatientViewModel> ?? new List<PatientViewModel>())
+                                        {
+                                            if (paciente.DoctorOfficeId == lbt.DoctorOfficeId)
+                                            {
+                                                <td>@paciente.Name</td>
+                                                <td>@paciente.LastName</td>
+                                                <td>@paciente.Dni</td>
+                                            }
+                                        }
+                                        <td>
+                                            @foreach (var pruebas in ViewBag.LabTest as List<LabTestViewModel> ?? new List<LabTestViewModel>())
+                                            {
+                                                if (pruebas.IdPatient == lbt.Id)
+                                                {
+                                                    @pruebas.Name
+                                                }   
+                                            }
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-warning text-black" asp-controller="ResultLabTest" asp-action="Create" asp-route-idResultLabTest="@lbt.Id">Reportar resultados</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        No hay pruebas registradas
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function eliminar(event, idLaboratorio) {
+            event.preventDefault();
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: '@TempData["Error"]',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                </text>
+            }
+            else
+            {
+                <text>
+                    Swal.fire({
+                        title: '¿Está seguro de que desea eliminar esta prueba?',
+                        showDenyButton: true,
+                        confirmButtonText: `Si`,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/LabTest/Delete?idLabTest=${idLaboratorio}`;
+                        }
+                    });
+                </text>
+            }
+        }
+    </script>
+}

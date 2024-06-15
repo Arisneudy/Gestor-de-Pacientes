@@ -1,0 +1,148 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Office
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@using GestorDePaciente.Core.Application.ViewModels.Role
+@using GestorDePaciente.Core.Application.ViewModels.Users
+@model GestorDePaciente.Core.Application.ViewModels.Users.SaveUserViewModel;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    bool isEditing = Model.Id == 0 ? false : true;
+    UserViewModel user = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+@{
+    ViewData["Title"] = $"{(isEditing ? "Actualizar" : "Crear")}";
+}
+<style>
+    .container-fluid {
+        display: flex;
+        justify-content: center;
+    }
+
+    .card {
+        border-radius: 10px;
+        height: auto;
+        width: 30rem;
+    }
+</style>
+<div class="container-fluid">
+    <div class="mt-5">
+        <div class="card shadow-lg">
+            <div class="mt-5 text-center text-black">
+                <h1 class="h3 fw-bold mb-3">@(isEditing ? "Actualizar" : "Crear") Usuario</h1>
+            </div>
+            <div class="card-body text-black">
+                <form method="post" enctype="multipart/form-data" asp-action="@(isEditing ? "Edit" : "Create")" asp-controller="User">
+                    <div class="row mb-3">
+                        <input asp-for="Id" hidden readonly/>
+                        <div class="col">
+                            <label asp-for="UserName" class="form-label">Nombre de Usuario</label>
+                            <input asp-for="UserName" class="form-control" style="@(isEditing ? "pointer-events: none; background-color: #DEDEDE" : "")"/>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                            <div class="text-danger">@ViewData.ModelState["userValidation"]?.Errors.FirstOrDefault()?.ErrorMessage</div>
+                        </div>
+                        <div class="col">
+                            <label asp-for="Name" class="form-label">Nombre</label>
+                            <input asp-for="Name" class="form-control"/>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="LastName" class="form-label">Apellido</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="col">
+                            <label asp-for="Email" class="form-label">Correo Electrónico</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="DoctorOfficeId" class="form-label">Consultorio</label>
+                            <select asp-for="DoctorOfficeId" class="form-select" style="pointer-events: none; background-color: #DEDEDE">
+                                @foreach (var doctorOffice in ViewBag.doctorOffices as List<DoctorOfficeViewModel> ?? new List<DoctorOfficeViewModel>())
+                                {
+                                    if (doctorOffice.Id == user.DoctorOfficeId)
+                                    {
+                                        <option value="@doctorOffice.Id" selected>@doctorOffice.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@doctorOffice.Id">@doctorOffice.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="@Model.DoctorOfficeId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="RoleId" class="form-label">Tipo de Usuario</label>
+                            <select asp-for="RoleId" class="form-select" style="@(user.RoleId == 1 && user.UserName == Model.UserName ? "pointer-events: none; background-color: #DEDEDE" : "")">
+                                @foreach (var role in ViewBag.Roles as List<RoleViewModel> ?? new List<RoleViewModel>())
+                                {
+                                    <option value="@role.Id">@role.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="RoleId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class=" row mb-3">
+                        <div class="col">
+                            <label asp-for="Password" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <input asp-for="Password" id="password" class="form-control" />
+                                <span class="input-group-text" onclick="togglePasswordVisibility('password', 'togglePasswordIconPassword')" style="cursor: pointer;">
+                                    <i class="bi bi-eye" id="togglePasswordIconPassword"></i>
+                                </span>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="col">
+                            <label asp-for="RepetPassword" class="form-label">Confirmar Contraseña</label>
+                            <div class="input-group">
+                                <input asp-for="RepetPassword" id="repeatpassword" class="form-control" />
+                                <span class="input-group-text" onclick="togglePasswordVisibility('repeatpassword', 'togglePasswordIconRepeatPassword')" style="cursor: pointer;">
+                                    <i class="bi bi-eye" id="togglePasswordIconRepeatPassword"></i>
+                                </span>
+                            </div>
+                            <span asp-validation-for="RepetPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">@(isEditing ? "Actualizar" : "Crear")</button>
+                        <a asp-action="User" asp-controller="User" class="btn btn-link text-decoration-none">Ir atras</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function togglePasswordVisibility(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const togglePasswordIcon = document.getElementById(iconId);
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordIcon.classList.remove('bi-eye');
+            togglePasswordIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            togglePasswordIcon.classList.remove('bi-eye-slash');
+            togglePasswordIcon.classList.add('bi-eye');
+        }
+    }
+
+</script>
+}

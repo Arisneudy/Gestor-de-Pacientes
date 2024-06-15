@@ -1,0 +1,122 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Office
+@model GestorDePaciente.Core.Application.ViewModels.Login.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Registro";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .container-fluid {
+        display: flex;
+        justify-content: center;
+    }
+
+    .card {
+        border-radius: 10px;
+        height: auto;
+        width: 30rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="mt-5">
+        <div class="card shadow-lg">
+            <div class="mt-5 text-center text-black">
+                <img class="mb-3" src="/img/logo-login.png" alt="Logo-login" width="100" height="100" />
+                <h1 class="h3 fw-bold mb-3">Registro de Usuarios</h1>
+            </div>
+            <div class="card-body text-black">
+                <form method="post" asp-action="Register" asp-controller="Login">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="UserName" class="form-label">Nombre de Usuario</label>
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                            <div class="text-danger">@ViewData.ModelState["userValidation"]?.Errors.FirstOrDefault()?.ErrorMessage</div>
+                        </div>
+                        <div class="col">
+                            <label asp-for="Name" class="form-label">Nombre</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="LastName" class="form-label">Apellido</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="col">
+                            <label asp-for="Email" class="form-label">Correo Electrónico</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label asp-for="DoctorOfficeId" class="form-label">Consultorio</label>
+                            <select asp-for="DoctorOfficeId" class="form-select">
+                                <option value="">Seleccione un consultorio</option>
+                                @foreach (var doctorOffice in ViewBag.doctorOffices as List<DoctorOfficeViewModel> ?? new List<DoctorOfficeViewModel>())
+                                {
+                                    <option value="@doctorOffice.Id">@doctorOffice.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="DoctorOfficeId" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class=" row mb-3">
+                        <div class="col">
+                            <label asp-for="Password" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <input asp-for="Password" id="password" class="form-control" required />
+                                <span class="input-group-text" onclick="togglePasswordVisibility('password', 'togglePasswordIconPassword')" style="cursor: pointer;">
+                                    <i class="bi bi-eye" id="togglePasswordIconPassword"></i>
+                                </span>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="col">
+                            <label asp-for="RepetPassword" class="form-label">Confirmar Contraseña</label>
+                            <div class="input-group">
+                                <input asp-for="RepetPassword" id="repeatpassword" class="form-control" required />
+                                <span class="input-group-text" onclick="togglePasswordVisibility('repeatpassword', 'togglePasswordIconRepeatPassword')" style="cursor: pointer;">
+                                    <i class="bi bi-eye" id="togglePasswordIconRepeatPassword"></i>
+                                </span>
+                            </div>
+                            <span asp-validation-for="RepetPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary ">Registrar</button>
+                        <p class="text-black mt-3">¿Tienes una cuenta? <a asp-action="Index" asp-controller="Login" class="btn btn-link text-decoration-none">Inicia sesion aqui!</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const togglePasswordIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePasswordIcon.classList.remove('bi-eye');
+                togglePasswordIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                togglePasswordIcon.classList.remove('bi-eye-slash');
+                togglePasswordIcon.classList.add('bi-eye');
+            }
+        }
+    </script>
+}

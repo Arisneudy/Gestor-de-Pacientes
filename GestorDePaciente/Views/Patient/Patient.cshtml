@@ -1,0 +1,115 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Users
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@model List<GestorDePaciente.Core.Application.ViewModels.Office.Patient.PatientViewModel>
+@{
+    ViewData["Title"] = "Pacientes";
+}
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserViewModel userAc = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+<style>
+    .btn-outline-primary {
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mt-3">Mantenimiento de Pacientes</h1>
+            <div class="mt-5 mb-4 d-flex justify-content-end">
+                <a class="btn btn-outline-primary" asp-controller="Patient" asp-action="Create">Agregar un nuevo paciente</a>
+            </div>
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        <table class="table table-sm table-hover table-borderless text-center">
+                            <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Email</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var patient in Model)
+                            {
+                                @if (patient != null && userAc.DoctorOfficeId == patient.DoctorOfficeId)
+                                {
+                                    <tr class="text-center align-middle">
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(patient.UrlProfilePicture))
+                                            {
+                                                <img src="@patient.UrlProfilePicture" alt="Foto de perfil" class="rounded-circle" style="width: 50px; height: 50px;">
+                                            }
+                                            else
+                                            {
+                                                <div>No Hay</div>
+                                            }
+                                        </td>
+                                            <td>@patient.Name</td>
+                                            <td>@patient.LastName</td>
+                                            <td>@patient.Email</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-warning text-black" asp-controller="Patient" asp-action="Edit" asp-route-idPatient="@patient.Id">Editar</a>
+                                            <a class="btn btn-sm btn-outline-danger" asp-controller="Patient" asp-action="Delete" asp-route-idPatient="@patient.Id" onclick="eliminar(event, @patient.Id)">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        No hay pacientes registrados
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function eliminar(event, idPatient) {
+            event.preventDefault();
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: '@TempData["Error"]',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                </text>
+            }
+            else
+            {
+                <text>
+                    Swal.fire({
+                        title: '¿Está seguro de que desea eliminar este paciente?',
+                        showDenyButton: true,
+                        confirmButtonText: `Si`,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/Patient/Delete?idPatient=${idPatient}`;
+                        }
+                    });
+                </text>
+            }
+        }
+    </script>
+}

@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@using GestorDePaciente.Core.Application.ViewModels.Users
+@model List<GestorDePaciente.Core.Application.ViewModels.Users.UserViewModel>
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserViewModel user = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+
+<div class="container">
+    <div class="text-center mt-5">
+        <img src="@(user.Id == 1 ? "/img/admin.jpg" : "/img/asistent.jpg")" alt="imagen de inicio" width="900px" height="500px"/>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@using GestorDePaciente.Core.Application.ViewModels.Users
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http;
+@using GestorDePaciente.Core.Application.Helpers;
+@model List<GestorDePaciente.Core.Application.ViewModels.Users.UserViewModel>
+@{
+    ViewData["Title"] = "Usuarios";
+}
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserViewModel userAc = HttpContextAccessor.HttpContext?.Session?.Get<UserViewModel>("user")!;
+}
+<style>
+    .btn-outline-primary {
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-center mt-3">Mantenimiento de Usuarios</h1>
+            <div class="mt-5 mb-4 d-flex justify-content-end">
+                <a class="btn btn-outline-primary" asp-controller="User" asp-action="Create">Agregar un nuevo usuario</a>
+            </div>
+            @if (Model != null && Model.Any())
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        <table class="table table-sm table-hover table-borderless text-center">
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var user in Model)
+                            {
+                                @if (user != null)
+                                {
+                                    <tr>
+                                        <td>@(user.Id == userAc.Id ? $"{user.Name} (Actual)" : $"{user.Name}" )</td>
+                                        <td>@user.Email</td>
+                                        <td>@(user.RoleId == 1 ? "Administrador" : "Asistente")</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-warning text-black" asp-controller="User" asp-action="Edit" asp-route-idUsuario="@user.Id">Editar</a>
+                                            <a class="btn btn-sm btn-outline-danger" asp-controller="User" asp-action="Delete" asp-route-idUsuario="@user.Id" onclick="eliminar(event, @user.Id)">Eliminar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-black">
+                        No hay usuarios registrados
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function eliminar(event, idUsuario) {
+            event.preventDefault();
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        title: '@TempData["Error"]',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                </text>
+            }
+            else
+            {
+                <text>
+                    Swal.fire({
+                        title: '¿Está seguro de que desea eliminar este usuario?',
+                        showDenyButton: true,
+                        confirmButtonText: `Si`,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/User/Delete?idUsuario=${idUsuario}`;
+                        }
+                    });
+                </text>
+            }
+        }
+    </script>
+}

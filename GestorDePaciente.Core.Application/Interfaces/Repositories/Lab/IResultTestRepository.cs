@@ -1,0 +1,9 @@
+﻿using GestorDePaciente.Core.Application.Interfaces.Repositories.General;
+using GestorDePaciente.Core.Domain.Entities.Lab;
+
+namespace GestorDePaciente.Core.Application.Interfaces.Repositories.Lab;
+
+public interface IResultTestRepository : IGenericRepository<ResultLabTest>
+{
+    Task<List<ResultLabTest>> GetPendingTestsByUserId(int patientId);
+}
